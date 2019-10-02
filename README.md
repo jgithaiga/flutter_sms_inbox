@@ -16,7 +16,7 @@ dependencies:
 Add the import statement for sms and create an instance of the SmsQuery class:
 
 ```
-import 'package:sms/sms.dart';
+import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 
 void main() {
   SmsQuery query = new SmsQuery();
