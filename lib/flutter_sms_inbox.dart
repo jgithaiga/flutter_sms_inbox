@@ -40,15 +40,15 @@ class SmsMessage implements Comparable<SmsMessage> {
   SmsMessageKind _kind;
   SmsMessageState _state = SmsMessageState.None;
   StreamController<SmsMessageState> _stateStreamController =
-  new StreamController<SmsMessageState>();
+      new StreamController<SmsMessageState>();
 
   SmsMessage(this._address, this._body,
       {int id,
-        int threadId,
-        bool read,
-        DateTime date,
-        DateTime dateSent,
-        SmsMessageKind kind}) {
+      int threadId,
+      bool read,
+      DateTime date,
+      DateTime dateSent,
+      SmsMessageKind kind}) {
     this._id = id;
     this._threadId = threadId;
     this._read = read;
@@ -87,7 +87,7 @@ class SmsMessage implements Comparable<SmsMessage> {
     }
     if (data.containsKey("date_sent")) {
       this._dateSent =
-      new DateTime.fromMillisecondsSinceEpoch(data["date_sent"]);
+          new DateTime.fromMillisecondsSinceEpoch(data["date_sent"]);
     }
   }
 
@@ -190,10 +190,10 @@ class SmsQuery {
   /// Wrapper for query only one kind
   Future<List<SmsMessage>> _querySmsWrapper(
       {int start,
-        int count,
-        String address,
-        int threadId,
-        SmsQueryKind kind: SmsQueryKind.Inbox}) async {
+      int count,
+      String address,
+      int threadId,
+      SmsQueryKind kind: SmsQueryKind.Inbox}) async {
     Map arguments = {};
     if (start != null && start >= 0) {
       arguments["start"] = start;
@@ -233,11 +233,11 @@ class SmsQuery {
   /// Query a list of SMS
   Future<List<SmsMessage>> querySms(
       {int start,
-        int count,
-        String address,
-        int threadId,
-        List<SmsQueryKind> kinds: const [SmsQueryKind.Inbox],
-        bool sort: true}) async {
+      int count,
+      String address,
+      int threadId,
+      List<SmsQueryKind> kinds: const [SmsQueryKind.Inbox],
+      bool sort: true}) async {
     List<SmsMessage> result = [];
     for (var kind in kinds) {
       result
