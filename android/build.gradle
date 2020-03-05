@@ -1,5 +1,3 @@
-package android
-
 group 'com.juliusgithaiga.flutter_sms_inbox'
 version '1.0-SNAPSHOT'
 
