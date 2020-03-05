@@ -8,7 +8,7 @@ Install the library from pub:
 
 ```
 dependencies:
-  flutter_sms_inbox: ^0.1.0
+  flutter_sms_inbox: ^0.1.1+1
 ```
 
 ## Querying SMS messages

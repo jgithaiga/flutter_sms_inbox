@@ -1,3 +1,6 @@
+## 0.1.1+1
+* Remove minSdk version from android manifest file
+
 ## 0.1.1
 
 * Implemented Health and Maintenance suggestions
