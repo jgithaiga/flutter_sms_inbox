@@ -4,12 +4,14 @@ import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
+
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
   final SmsQuery _query = SmsQuery();
+  final DeleteSms _delete = DeleteSms();
   List<SmsMessage> _messages = List<SmsMessage>();
 
   @override
@@ -24,8 +26,15 @@ class _MyAppState extends State<MyApp> {
         var message = _messages[i];
 
         return ListTile(
-          title: Text('#${message.id} from ${message.address}'),
+          title: Text('${message.address} #${message.id}'),
           subtitle: Text(message.body),
+          trailing: IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () async {
+              print('Delete message > id: ${message.id}');
+              await _delete.deleteSms(smsId: message.id,);
+            },
+          ),
         );
       },
     );
