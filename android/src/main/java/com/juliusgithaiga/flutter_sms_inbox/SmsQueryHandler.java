@@ -1,6 +1,8 @@
 package com.juliusgithaiga.flutter_sms_inbox;
 
 import android.Manifest;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 
@@ -15,8 +17,8 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 
 class SmsQueryHandler implements PluginRegistry.RequestPermissionsResultListener {
-	private final PluginRegistry.Registrar registrar;
-	private final String[] permissionsList = new String[]{Manifest.permission.READ_SMS};
+	private final String[] permissionsList = new String[]{ Manifest.permission.READ_SMS };
+	private Context appContext;
 	private MethodChannel.Result result;
 	private SmsQueryRequest request;
 	private int start = 0;
@@ -24,9 +26,9 @@ class SmsQueryHandler implements PluginRegistry.RequestPermissionsResultListener
 	private int threadId = -1;
 	private String address = null;
 
-	SmsQueryHandler(PluginRegistry.Registrar registrar, MethodChannel.Result result, SmsQueryRequest request,
+	SmsQueryHandler(Context appContext, MethodChannel.Result result, SmsQueryRequest request,
 					int start, int count, int threadId, String address) {
-		this.registrar = registrar;
+		this.appContext = appContext;
 		this.result = result;
 		this.request = request;
 		this.start = start;
@@ -36,7 +38,7 @@ class SmsQueryHandler implements PluginRegistry.RequestPermissionsResultListener
 	}
 
 	void handle(Permissions permissions) {
-		if (permissions.checkAndRequestPermission(permissionsList, Permissions.SEND_SMS_ID_REQ)) {
+		if (permissions.checkAndRequestPermission(permissionsList, Permissions.READ_SMS_ID_REQ)) {
 			querySms();
 		}
 	}
@@ -47,11 +49,9 @@ class SmsQueryHandler implements PluginRegistry.RequestPermissionsResultListener
 			try {
 				if (cursor.getColumnName(idx).equals("address") || cursor.getColumnName(idx).equals("body")) {
 					res.put(cursor.getColumnName(idx), cursor.getString(idx));
-				}
-				else if (cursor.getColumnName(idx).equals("date") || cursor.getColumnName(idx).equals("date_sent")) {
+				} else if (cursor.getColumnName(idx).equals("date") || cursor.getColumnName(idx).equals("date_sent")) {
 					res.put(cursor.getColumnName(idx), cursor.getLong(idx));
-				}
-				else {
+				} else {
 					res.put(cursor.getColumnName(idx), cursor.getInt(idx));
 				}
 			} catch (JSONException e) {
@@ -63,16 +63,19 @@ class SmsQueryHandler implements PluginRegistry.RequestPermissionsResultListener
 
 	private void querySms() {
 		ArrayList<JSONObject> list = new ArrayList<>();
-		Cursor cursor = registrar.context().getContentResolver().query(this.request.toUri(), null, null, null, null);
+		ContentResolver contextResolver = appContext.getContentResolver();
+		Cursor cursor = contextResolver.query(this.request.toUri(), null, null, null, null);
 		if (cursor == null) {
 			result.error("#01", "permission denied", null);
 			return;
 		}
+
 		if (!cursor.moveToFirst()) {
 			cursor.close();
 			result.success(list);
 			return;
 		}
+
 		do {
 			JSONObject obj = readSms(cursor);
 			try {
@@ -85,24 +88,31 @@ class SmsQueryHandler implements PluginRegistry.RequestPermissionsResultListener
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
+
 			if (start > 0) {
 				start--;
 				continue;
 			}
+
 			list.add(obj);
+
 			if (count > 0) {
 				count--;
 			}
 		} while (cursor.moveToNext() && count != 0);
+
 		cursor.close();
+
 		result.success(list);
 	}
 
 	@Override
 	public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		System.out.println("onRequestPermissionsResult > requestCode:" + requestCode);
 		if (requestCode != Permissions.READ_SMS_ID_REQ) {
 			return false;
 		}
+
 		boolean isOk = true;
 		for (int res : grantResults) {
 			if (res != PackageManager.PERMISSION_GRANTED) {
@@ -110,11 +120,14 @@ class SmsQueryHandler implements PluginRegistry.RequestPermissionsResultListener
 				break;
 			}
 		}
+
 		if (isOk) {
 			querySms();
 			return true;
 		}
+
 		result.error("#01", "permission denied", null);
+
 		return false;
 	}
 }

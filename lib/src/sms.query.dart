@@ -8,7 +8,9 @@ class SmsQuery {
   factory SmsQuery() {
     if (_instance == null) {
       final MethodChannel methodChannel = const MethodChannel(
-          "plugins.juliusgithaiga.com/querySMS", const JSONMethodCodec());
+        "plugins.juliusgithaiga.com/querySMS",
+        const JSONMethodCodec(),
+      );
       _instance = new SmsQuery._private(methodChannel);
     }
     return _instance;
@@ -23,20 +25,24 @@ class SmsQuery {
     int threadId,
     String address,
     SmsQueryKind kind: SmsQueryKind.Inbox,
-  }) async {
+  }) {
     Map arguments = {};
     if (start != null && start >= 0) {
       arguments["start"] = start;
     }
+
     if (count != null && count > 0) {
       arguments["count"] = count;
     }
+
     if (address != null && address.isNotEmpty) {
       arguments["address"] = address;
     }
+
     if (threadId != null && threadId >= 0) {
       arguments["thread_id"] = threadId;
     }
+
     String function;
     SmsMessageKind msgKind;
     if (kind == SmsQueryKind.Inbox) {
@@ -50,7 +56,7 @@ class SmsQuery {
       msgKind = SmsMessageKind.Draft;
     }
 
-    return await _channel.invokeMethod(function, arguments).then((dynamic val) {
+    return _channel.invokeMethod(function, arguments).then((dynamic val) {
       List<SmsMessage> list = [];
       for (Map data in val) {
         SmsMessage msg = new SmsMessage.fromJson(data);
@@ -74,22 +80,29 @@ class SmsQuery {
     for (var kind in kinds) {
       result
         ..addAll(await this._querySmsWrapper(
+          kind: kind,
           start: start,
           count: count,
           address: address,
           threadId: threadId,
-          kind: kind,
         ));
     }
+
     if (sort == true) {
       result.sort((a, b) => a.compareTo(b));
     }
+
     return (result);
   }
 
   /// Get all SMS
-  Future<List<SmsMessage>> get getAllSms async {
+  Future<List<SmsMessage>> get getAllSms {
     return this.querySms(
-        kinds: [SmsQueryKind.Sent, SmsQueryKind.Inbox, SmsQueryKind.Draft]);
+      kinds: [
+        SmsQueryKind.Sent,
+        SmsQueryKind.Inbox,
+        SmsQueryKind.Draft,
+      ],
+    );
   }
 }

@@ -1,3 +1,5 @@
+part of flutter_sms_inbox;
+
 enum SmsMessageState {
   Sending,
   Sent,

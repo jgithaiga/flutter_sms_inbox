@@ -1,6 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter_sms_inbox/enums.dart';
+part of flutter_sms_inbox;
 
 /// A SMS Message
 ///
