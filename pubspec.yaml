@@ -1,7 +1,7 @@
 name: flutter_sms_inbox
 description: Flutter plugin to easily query device SMS Inbox. Supports android only.
 homepage: https://github.com/jgithaiga/flutter_sms_inbox
-version: 0.1.2-nullsafety
+version: 1.0.0-nullsafety.0
 
 flutter:
   plugin:
