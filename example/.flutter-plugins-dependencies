@@ -1,1 +1,1 @@
-{"_info":"// This is a generated file; do not edit or check into version control.","dependencyGraph":[{"name":"flutter_sms_inbox","dependencies":[]}]}
+{"info":"This is a generated file; do not edit or check into version control.","plugins":{"ios":[],"android":[{"name":"flutter_sms_inbox","path":"/Users/julius/git/flutter_sms_inbox/","dependencies":[]}],"macos":[],"linux":[],"windows":[],"web":[]},"dependencyGraph":[{"name":"flutter_sms_inbox","dependencies":[]}],"date_created":"2021-05-27 15:01:12.004583","version":"2.2.0"}

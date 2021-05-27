@@ -8,7 +8,7 @@ Install the library from pub:
 
 ```
 dependencies:
-  flutter_sms_inbox: ^0.1.1+1
+  flutter_sms_inbox: [version]
 ```
 
 ## Querying SMS messages
@@ -19,7 +19,7 @@ Add the import statement for sms and create an instance of the SmsQuery class:
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 
 void main() {
-  SmsQuery query = new SmsQuery();
+  SmsQuery query = SmsQuery();
 }
 ```
 
