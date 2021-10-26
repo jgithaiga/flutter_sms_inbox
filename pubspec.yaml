@@ -1,7 +1,7 @@
 name: flutter_sms_inbox
 description: Flutter SMS Inbox Plugin (Android only)
-version: 0.0.1
-homepage:
+homepage: https://github.com/jgithaiga/flutter_sms_inbox
+version: 1.0.1
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
