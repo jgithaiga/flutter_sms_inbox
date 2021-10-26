@@ -25,8 +25,8 @@ public class Permissions {
 	}
 
 	private boolean hasPermissions(String[] permissions) {
-		for (String perm : permissions) {
-			if (!hasPermission(perm)) {
+		for (String permission : permissions) {
+			if (!hasPermission(permission)) {
 				return false;
 			}
 		}
@@ -41,12 +41,14 @@ public class Permissions {
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
 			return true;
 		}
+
 		if (!hasPermissions(permissions)) {
 			PermissionsRequestHandler.requestPermissions(
 					new PermissionsRequest(id, permissions, activity)
 			);
 			return false;
 		}
+
 		return true;
 	}
 }

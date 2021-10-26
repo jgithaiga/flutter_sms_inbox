@@ -1,76 +1,47 @@
 package com.juliusgithaiga.flutter_sms_inbox;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
-import com.juliusgithaiga.flutter_sms_inbox.permissions.Permissions;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.PluginRegistry;
 
-public class SmsQueryHandler implements PluginRegistry.RequestPermissionsResultListener {
+public class SmsQueryHandler {
 
-    private final String[] permissionsList = new String[]{Manifest.permission.READ_SMS};
-    private Context applicationContext;
-    private MethodChannel.Result result;
-    private SmsQueryRequest request;
-    private int start = 0;
-    private int count = -1;
-    private int threadId = -1;
-    private String address = null;
+    private final Context applicationContext;
+    private final MethodChannel.Result result;
+    private final SmsQueryRequest request;
+    private final String address;
+    private final int threadId;
+    private int start;
+    private int count;
 
     SmsQueryHandler(Context applicationContext, MethodChannel.Result result, SmsQueryRequest request,
                     int start, int count, int threadId, String address) {
         this.applicationContext = applicationContext;
         this.result = result;
         this.request = request;
-        this.start = start;
-        this.count = count;
         this.threadId = threadId;
         this.address = address;
+        this.start = start;
+        this.count = count;
     }
 
-    void handle(Permissions permissions) {
-        if (permissions.checkAndRequestPermission(permissionsList, Permissions.SEND_SMS_ID_REQ)) {
-            querySms();
-        }
-    }
-
-    private JSONObject readSms(Cursor cursor) {
-        JSONObject res = new JSONObject();
-        for (int idx = 0; idx < cursor.getColumnCount(); idx++) {
-            try {
-                if (cursor.getColumnName(idx).equals("address") || cursor.getColumnName(idx).equals("body")) {
-                    res.put(cursor.getColumnName(idx), cursor.getString(idx));
-                }
-                else if (cursor.getColumnName(idx).equals("date") || cursor.getColumnName(idx).equals("date_sent")) {
-                    res.put(cursor.getColumnName(idx), cursor.getLong(idx));
-                }
-                else {
-                    res.put(cursor.getColumnName(idx), cursor.getInt(idx));
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return res;
-    }
-
-    private void querySms() {
+    void handle() {
         ArrayList<JSONObject> list = new ArrayList<>();
         Cursor cursor = this.applicationContext.getContentResolver().query(this.request.toUri(), null, null, null, null);
         if (cursor == null) {
-            result.error("#01", "permission denied", null);
+            result.error("no_cursor", "flutter_sms_inbox plugin requires cursor to resolve content", null);
             return;
         }
+
         if (!cursor.moveToFirst()) {
             cursor.close();
             result.success(list);
             return;
         }
+
         do {
             JSONObject obj = readSms(cursor);
             try {
@@ -83,6 +54,7 @@ public class SmsQueryHandler implements PluginRegistry.RequestPermissionsResultL
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
             if (start > 0) {
                 start--;
                 continue;
@@ -96,23 +68,22 @@ public class SmsQueryHandler implements PluginRegistry.RequestPermissionsResultL
         result.success(list);
     }
 
-    @Override
-    public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode != Permissions.READ_SMS_ID_REQ) {
-            return false;
-        }
-        boolean isOk = true;
-        for (int res : grantResults) {
-            if (res != PackageManager.PERMISSION_GRANTED) {
-                isOk = false;
-                break;
+    private JSONObject readSms(Cursor cursor) {
+        JSONObject res = new JSONObject();
+        for (int i = 0; i < cursor.getColumnCount(); i++) {
+            try {
+                if (cursor.getColumnName(i).equals("address") || cursor.getColumnName(i).equals("body")) {
+                    res.put(cursor.getColumnName(i), cursor.getString(i));
+                } else if (cursor.getColumnName(i).equals("date") || cursor.getColumnName(i).equals("date_sent")) {
+                    res.put(cursor.getColumnName(i), cursor.getLong(i));
+                } else {
+                    res.put(cursor.getColumnName(i), cursor.getInt(i));
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
         }
-        if (isOk) {
-            querySms();
-            return true;
-        }
-        result.error("#01", "permission denied", null);
-        return false;
+        return res;
     }
+
 }

@@ -1,20 +1,16 @@
 package com.juliusgithaiga.flutter_sms_inbox;
 
-import android.app.Activity;
 import android.content.Context;
 import androidx.annotation.NonNull;
-import com.juliusgithaiga.flutter_sms_inbox.permissions.Permissions;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
 public class SmsQuery implements MethodChannel.MethodCallHandler {
 
     private final Context applicationContext;
-    private final Permissions permissions;
 
-    SmsQuery(Activity activity, Context applicationContext) {
+    SmsQuery(Context applicationContext) {
         this.applicationContext = applicationContext;
-        this.permissions = new Permissions(activity);
     }
 
     @Override
@@ -38,6 +34,7 @@ public class SmsQuery implements MethodChannel.MethodCallHandler {
                 result.notImplemented();
                 return;
         }
+
         if (call.hasArgument("start")) {
             start = call.argument("start");
         }
@@ -50,8 +47,9 @@ public class SmsQuery implements MethodChannel.MethodCallHandler {
         if (call.hasArgument("address")) {
             address = call.argument("address");
         }
-        SmsQueryHandler handler = new SmsQueryHandler(this.applicationContext, result, request, start, count, threadId, address);
-//        this.registrar.addRequestPermissionsResultListener(handler);
-        handler.handle(permissions);
+
+        SmsQueryHandler smsQueryHandler = new SmsQueryHandler(
+                this.applicationContext, result, request, start, count, threadId, address);
+        smsQueryHandler.handle();
     }
 }
