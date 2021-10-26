@@ -6,11 +6,11 @@ class SmsQuery {
 
   factory SmsQuery() {
     if (_instance == null) {
-      final MethodChannel methodChannel = const MethodChannel(
+      const MethodChannel methodChannel = MethodChannel(
         "plugins.juliusgithaiga.com/querySMS",
-        const JSONMethodCodec(),
+        JSONMethodCodec(),
       );
-      _instance = new SmsQuery._private(methodChannel);
+      _instance = SmsQuery._private(methodChannel);
     }
     return _instance!;
   }
@@ -75,7 +75,7 @@ class SmsQuery {
     List<SmsMessage> result = [];
     for (var kind in kinds) {
       result
-        ..addAll(await this._querySmsWrapper(
+        .addAll(await _querySmsWrapper(
           start: start,
           count: count,
           address: address,
@@ -83,6 +83,7 @@ class SmsQuery {
           kind: kind,
         ));
     }
+
     if (sort == true) {
       result.sort((a, b) => a.compareTo(b));
     }
@@ -92,7 +93,7 @@ class SmsQuery {
 
   /// Get all SMS
   Future<List<SmsMessage>> get getAllSms async {
-    return this.querySms(kinds: [
+    return querySms(kinds: [
       SmsQueryKind.Sent,
       SmsQueryKind.Inbox,
       SmsQueryKind.Draft,

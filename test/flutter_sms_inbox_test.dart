@@ -5,6 +5,8 @@ import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 void main() {
   const MethodChannel channel = MethodChannel('flutter_sms_inbox');
 
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   setUp(() {
     channel.setMockMethodCallHandler((MethodCall methodCall) async {
       return '42';
