@@ -1,18 +1,3 @@
-## 1.0.0-nullsafety.0
-* Migrate to non-nullable types.
-
-## 0.1.1+1
-* Remove minSdk version from android manifest file.
-* Remove the deprecated `author` field from pubspec.yaml.
-
-## 0.1.1
-
-* Implemented Health and Maintenance suggestions.
-
-## 0.1.0
-
-* Changed the default `About` description.
-
 ## 0.0.1
 
-* The initial release.
+* TODO: Describe initial release.

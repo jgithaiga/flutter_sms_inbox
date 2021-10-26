@@ -1,37 +1,38 @@
 package com.juliusgithaiga.flutter_sms_inbox;
 
-import com.juliusgithaiga.flutter_sms_inbox.permissions.Permissions;
+import androidx.annotation.NonNull;
 
-import io.flutter.plugin.common.JSONMethodCodec;
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 /** FlutterSmsInboxPlugin */
-public class FlutterSmsInboxPlugin implements MethodCallHandler {
-  private static final String CHANNEL_QUERY = "plugins.juliusgithaiga.com/querySMS";
+public class FlutterSmsInboxPlugin implements FlutterPlugin, MethodCallHandler {
+  /// The MethodChannel that will the communication between Flutter and native Android
+  ///
+  /// This local reference serves to register the plugin with the Flutter Engine and unregister it
+  /// when the Flutter Engine is detached from the Activity
+  private MethodChannel channel;
 
-  /** Plugin registration. */
-  public static void registerWith(Registrar registrar) {
-    final MethodChannel channel = new MethodChannel(registrar.messenger(), "flutter_sms_inbox");
-    channel.setMethodCallHandler(new FlutterSmsInboxPlugin());
-
-    registrar.addRequestPermissionsResultListener(Permissions.getRequestsResultsListener());
-
-    /// SMS query
-    final SmsQuery query = new SmsQuery(registrar);
-    final MethodChannel querySmsChannel = new MethodChannel(registrar.messenger(), CHANNEL_QUERY, JSONMethodCodec.INSTANCE);
-    querySmsChannel.setMethodCallHandler(query);
+  @Override
+  public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
+    channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "flutter_sms_inbox");
+    channel.setMethodCallHandler(this);
   }
 
   @Override
-  public void onMethodCall(MethodCall call, Result result) {
+  public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
     if (call.method.equals("getPlatformVersion")) {
       result.success("Android " + android.os.Build.VERSION.RELEASE);
     } else {
       result.notImplemented();
     }
+  }
+
+  @Override
+  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+    channel.setMethodCallHandler(null);
   }
 }
