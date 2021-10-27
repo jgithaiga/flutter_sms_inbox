@@ -10,8 +10,8 @@ class SmsMessage implements Comparable<SmsMessage> {
   DateTime? _date;
   DateTime? _dateSent;
   SmsMessageKind? _kind;
-  SmsMessageState _state = SmsMessageState.None;
-  StreamController<SmsMessageState> _stateStreamController =
+  SmsMessageState _state = SmsMessageState.none;
+  final StreamController<SmsMessageState> _stateStreamController =
       StreamController<SmsMessageState>();
 
   SmsMessage(
@@ -24,89 +24,89 @@ class SmsMessage implements Comparable<SmsMessage> {
     DateTime? dateSent,
     SmsMessageKind? kind,
   }) {
-    this._id = id;
-    this._threadId = threadId;
-    this._read = read;
-    this._date = date;
-    this._dateSent = dateSent;
-    this._kind = kind;
+    _id = id;
+    _threadId = threadId;
+    _read = read;
+    _date = date;
+    _dateSent = dateSent;
+    _kind = kind;
   }
 
   SmsMessage.fromJson(Map data) {
-    this._address = data["address"];
-    this._body = data["body"];
+    _address = data["address"];
+    _body = data["body"];
     if (data.containsKey("_id")) {
-      this._id = data["_id"];
+      _id = data["_id"];
     }
     if (data.containsKey("thread_id")) {
-      this._threadId = data["thread_id"];
+      _threadId = data["thread_id"];
     }
     if (data.containsKey("read")) {
-      this._read = (data["read"].toInt() == 1);
+      _read = (data["read"].toInt() == 1);
     }
     if (data.containsKey("kind")) {
-      this._kind = data["kind"];
+      _kind = data["kind"];
     }
     if (data.containsKey("date")) {
-      this._date = DateTime.fromMillisecondsSinceEpoch(data["date"]);
+      _date = DateTime.fromMillisecondsSinceEpoch(data["date"]);
     }
     if (data.containsKey("date_sent")) {
-      this._dateSent = DateTime.fromMillisecondsSinceEpoch(data["date_sent"]);
+      _dateSent = DateTime.fromMillisecondsSinceEpoch(data["date_sent"]);
     }
   }
 
   /// Convert SMS to map
   Map get toMap {
-    Map res = {};
+    Map data = {};
     if (_address != null) {
-      res["address"] = _address;
+      data["address"] = _address;
     }
     if (_body != null) {
-      res["body"] = _body;
+      data["body"] = _body;
     }
     if (_id != null) {
-      res["_id"] = _id;
+      data["_id"] = _id;
     }
     if (_threadId != null) {
-      res["thread_id"] = _threadId;
+      data["thread_id"] = _threadId;
     }
     if (_read != null) {
-      res["read"] = _read;
+      data["read"] = _read;
     }
     if (_date != null) {
-      res["date"] = _date!.millisecondsSinceEpoch;
+      data["date"] = _date!.millisecondsSinceEpoch;
     }
     if (_dateSent != null) {
-      res["dateSent"] = _dateSent!.millisecondsSinceEpoch;
+      data["dateSent"] = _dateSent!.millisecondsSinceEpoch;
     }
-    return res;
+    return data;
   }
 
   /// Getters
-  int? get id => this._id;
-  int? get threadId => this._threadId;
-  String? get sender => this._address;
-  String? get address => this._address;
-  String? get body => this._body;
-  bool? get isRead => this._read;
-  DateTime? get date => this._date;
-  DateTime? get dateSent => this._dateSent;
-  SmsMessageKind? get kind => this._kind;
-  SmsMessageState get state => this._state;
+  int? get id => _id;
+  int? get threadId => _threadId;
+  String? get sender => _address;
+  String? get address => _address;
+  String? get body => _body;
+  bool? get isRead => _read;
+  DateTime? get date => _date;
+  DateTime? get dateSent => _dateSent;
+  SmsMessageKind? get kind => _kind;
+  SmsMessageState get state => _state;
   Stream<SmsMessageState> get onStateChanged => _stateStreamController.stream;
 
   /// Setters
-  set kind(SmsMessageKind? kind) => this._kind = kind;
-  set date(DateTime? date) => this._date = date;
+  set kind(SmsMessageKind? kind) => _kind = kind;
+  set date(DateTime? date) => _date = date;
   set state(SmsMessageState state) {
-    if (this._state != state) {
-      this._state = state;
+    if (_state != state) {
+      _state = state;
       _stateStreamController.add(state);
     }
   }
 
   @override
   int compareTo(SmsMessage other) {
-    return other._id! - this._id!;
+    return other._id! - _id!;
   }
 }
