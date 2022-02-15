@@ -37,7 +37,7 @@ class _MyAppState extends State<MyApp> {
               var message = _messages[i];
 
               return ListTile(
-                title: Text('${message.sender}'),
+                title: Text('${message.sender} [${message.date}]'),
                 subtitle: Text('${message.body}'),
               );
             },
@@ -46,10 +46,11 @@ class _MyAppState extends State<MyApp> {
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
             final messages = await _query.querySms(
-              kinds: [SmsQueryKind.Inbox, SmsQueryKind.Sent],
+              kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
+              // address: '+254712345789',
               count: 10,
             );
-            print('sms inbox messages: $messages');
+            print('sms inbox messages: ${messages.length}');
 
             setState(() => _messages = messages);
           },

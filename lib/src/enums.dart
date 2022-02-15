@@ -1,17 +1,17 @@
 part of flutter_sms_inbox;
 
 enum SmsMessageState {
-  Sending,
-  Sent,
-  Delivered,
-  Fail,
-  None,
+  sending,
+  sent,
+  delivered,
+  fail,
+  none,
 }
 
 enum SmsMessageKind {
-  Sent,
-  Received,
-  Draft,
+  sent,
+  received,
+  draft,
 }
 
-enum SmsQueryKind { Inbox, Sent, Draft }
+enum SmsQueryKind { inbox, sent, draft }
