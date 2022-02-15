@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   runApp(const MyApp());
@@ -45,14 +46,19 @@ class _MyAppState extends State<MyApp> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            final messages = await _query.querySms(
-              kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
-              // address: '+254712345789',
-              count: 10,
-            );
-            print('sms inbox messages: ${messages.length}');
+            var permission = await Permission.sms.status;
+            if (permission.isGranted) {
+              final messages = await _query.querySms(
+                kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
+                // address: '+254712345789',
+                count: 10,
+              );
+              debugPrint('sms inbox messages: ${messages.length}');
 
-            setState(() => _messages = messages);
+              setState(() => _messages = messages);
+            } else {
+              await Permission.sms.request();
+            }
           },
           child: const Icon(Icons.refresh),
         ),
