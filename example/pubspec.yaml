@@ -26,9 +26,8 @@ dependencies:
     # the parent directory to use the current plugin's version.
     path: ../
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
+  # Use to request app permissions
+  permission_handler: ^9.0.1
 
 dev_dependencies:
   flutter_test:
