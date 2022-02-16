@@ -32,7 +32,7 @@ The method `querySms` from the `SmsQuery` class returns a list of sms depending 
 
 ```
 await query.querySms(
-    kinds: [SmsQueryKind.Inbox, SmsQueryKind.Sent],
+    kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
 );
 ```
 You can also query all the sms messages sent and received from a specific contact:
