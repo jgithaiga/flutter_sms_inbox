@@ -2,15 +2,6 @@
 
 Flutter android SMS inbox library based on [Flutter SMS](https://github.com/babariviere/flutter_sms).
 
-## Installation
-
-Install the library from pub:
-
-```
-dependencies:
-  flutter_sms_inbox: ^1.0.1
-```
-
 ## Querying SMS messages
 
 Add the import statement for sms and create an instance of the SmsQuery class:
