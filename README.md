@@ -1,5 +1,8 @@
 # Flutter SMS Inbox
 
+[![pub package](https://img.shields.io/pub/v/flutter_sms_inbox.svg)](https://pub.dev/packages/flutter_sms_inbox)
+[![pub points](https://img.shields.io/pub/points/flutter_sms_inbox?color=2E8B57&label=pub%20points)](https://pub.dev/packages/flutter_sms_inbox/score)
+
 Flutter android SMS inbox library based on [Flutter SMS](https://github.com/babariviere/flutter_sms).
 
 ### Dependencies
