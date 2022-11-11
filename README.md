@@ -2,6 +2,17 @@
 
 Flutter android SMS inbox library based on [Flutter SMS](https://github.com/babariviere/flutter_sms).
 
+### Dependencies
+
+This package in turn uses the permission handler package for permission handling, [Permission Handler](https://pub.dev/packages/permission_handler).
+
+You need to add it to your project:
+
+```
+dependencies:
+  permission_handler: ^10.2.0
+```
+
 ## Querying SMS messages
 
 Add the import statement for sms and create an instance of the SmsQuery class:
