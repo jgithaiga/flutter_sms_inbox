@@ -1,18 +1,18 @@
 part of flutter_sms_inbox;
 
 class SmsQuery {
-  static SmsQuery? _instance;
+  static SmsQuery? instance;
   final MethodChannel _channel;
 
   factory SmsQuery() {
-    if (_instance == null) {
+    if (instance == null) {
       const MethodChannel methodChannel = MethodChannel(
         "plugins.juliusgithaiga.com/querySMS",
         JSONMethodCodec(),
       );
-      _instance = SmsQuery._private(methodChannel);
+      instance = SmsQuery._private(methodChannel);
     }
-    return _instance!;
+    return instance!;
   }
 
   SmsQuery._private(this._channel);

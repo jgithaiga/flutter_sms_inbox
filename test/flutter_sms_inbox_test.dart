@@ -1,23 +1,33 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 
-void main() {
-  const MethodChannel channel = MethodChannel('flutter_sms_inbox');
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 
+import 'flutter_sms_inbox_test.mocks.dart';
+@GenerateNiceMocks([MockSpec<SmsQuery>()])
+// import 'sms.query.mocks.dart';
+
+void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUp(() {
-    channel.setMockMethodCallHandler((MethodCall methodCall) async {
-      return '42';
-    });
+  final mockSmsQuery = MockSmsQuery();
+  SmsQuery.instance = mockSmsQuery;
+  final SmsQuery smsQuery = SmsQuery();
+
+  tearDown(resetMockitoState);
+
+  test('getAllSms should call the underlying instance', () async {
+    when(smsQuery.getAllSms).thenAnswer((_) async => Future.value([]));
+
+    await smsQuery.getAllSms;
+    verify(smsQuery.getAllSms).called(1);
   });
 
-  tearDown(() {
-    channel.setMockMethodCallHandler(null);
-  });
+  test('querySms should call the underlying instance', () async {
+    when(smsQuery.querySms()).thenAnswer((_) async => Future.value([]));
 
-  test('getPlatformVersion', () async {
-    expect(await FlutterSmsInbox.platformVersion, '42');
+    await smsQuery.querySms();
+    verify(smsQuery.querySms()).called(1);
   });
 }
