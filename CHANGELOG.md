@@ -1,5 +1,6 @@
 ## 1.0.3
 * Added support for AGP 8.0
+* Update plugin test cases
 
 ## 1.0.2
 * Remove iOS platform
