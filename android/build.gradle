@@ -1,5 +1,5 @@
 group 'com.juliusgithaiga.flutter_sms_inbox'
-version '1.0'
+version '1.0-SNAPSHOT'
 
 buildscript {
     repositories {
@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:8.0.1'
     }
 }
 
@@ -22,6 +22,11 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
+    // Conditional for compatibility with AGP <4.2.
+    if (project.android.hasProperty("namespace")) {
+        namespace 'com.juliusgithaiga.flutter_sms_inbox'
+    }
+
     compileSdkVersion 31
 
     compileOptions {
@@ -31,5 +36,9 @@ android {
 
     defaultConfig {
         minSdkVersion 16
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
     }
 }
