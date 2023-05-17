@@ -1,3 +1,6 @@
+## 1.0.3
+* Added support for AGP 8.0
+
 ## 1.0.2
 * Remove iOS platform
 * Update description and fix lint errors
