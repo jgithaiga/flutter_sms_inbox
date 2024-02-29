@@ -8,6 +8,7 @@ class SmsMessage implements Comparable<SmsMessage> {
   String? body;
   bool? read;
   DateTime? date;
+  int? subId;
   DateTime? dateSent;
   SmsMessageKind? kind;
   SmsMessageState _state = SmsMessageState.none;
@@ -17,6 +18,8 @@ class SmsMessage implements Comparable<SmsMessage> {
   SmsMessage.fromJson(Map data) {
     address = data["address"];
     body = data["body"];
+    subId = data["sub_id"];
+
     if (data.containsKey("_id")) {
       id = data["_id"];
     }
@@ -48,6 +51,9 @@ class SmsMessage implements Comparable<SmsMessage> {
     }
     if (id != null) {
       data["_id"] = id;
+    }
+    if (subId != null) {
+      data["sub_id"] = subId;
     }
     if (threadId != null) {
       data["thread_id"] = threadId;
