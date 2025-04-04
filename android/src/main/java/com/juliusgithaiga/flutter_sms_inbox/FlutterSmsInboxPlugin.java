@@ -17,13 +17,6 @@ public class FlutterSmsInboxPlugin implements FlutterPlugin, MethodCallHandler {
   private MethodChannel methodChannel;
   private MethodChannel querySmsChannel;
 
-  /** Plugin registration. */
-  @SuppressWarnings("deprecation")
-  public static void registerWith(io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
-    final FlutterSmsInboxPlugin instance = new FlutterSmsInboxPlugin();
-    instance.onAttachedToEngine(registrar.context(), registrar.messenger());
-  }
-
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
     onAttachedToEngine(binding.getApplicationContext(), binding.getBinaryMessenger());
@@ -39,9 +32,15 @@ public class FlutterSmsInboxPlugin implements FlutterPlugin, MethodCallHandler {
 
   @Override
   public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-    methodChannel.setMethodCallHandler(null);
-    querySmsChannel.setMethodCallHandler(null);
-    methodChannel = querySmsChannel = null;
+    if (methodChannel != null) {
+      methodChannel.setMethodCallHandler(null);
+      methodChannel = null;
+    }
+
+    if (querySmsChannel != null) {
+      querySmsChannel.setMethodCallHandler(null);
+      querySmsChannel = null;
+    }
   }
 
   @Override
