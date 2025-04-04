@@ -5,6 +5,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
 import 'flutter_sms_inbox_test.mocks.dart';
+
 @GenerateNiceMocks([MockSpec<SmsQuery>()])
 // import 'sms.query.mocks.dart';
 
