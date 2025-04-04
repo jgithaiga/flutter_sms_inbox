@@ -17,10 +17,6 @@ jobs:
   flutter:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: packages/flutter_sms_inbox
-
     strategy:
       matrix:
         channel:
