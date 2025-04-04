@@ -1,0 +1,45 @@
+name: Build
+
+on:
+  pull_request:
+    paths-ignore:
+      - "**.md"
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "**.md"
+  schedule:
+    # runs the CI everyday at 10AM
+    - cron: "0 10 * * *"
+
+jobs:
+  flutter:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        channel:
+          - master
+
+    steps:
+      - uses: actions/checkout@v3.1.0
+
+      - uses: subosito/flutter-action@v2.7.1
+        with:
+          channel: ${{ matrix.channel }}
+
+      - name: Add pub cache bin to PATH
+        run: echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+      - name: Add pub cache to PATH
+        run: echo "PUB_CACHE="$HOME/.pub-cache"" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - run: dart format lib test --set-exit-if-changed
+        if: matrix.channel == 'master'
+
+      - run: flutter analyze --no-current-package
+
+      - run: flutter test --no-pub --coverage test
