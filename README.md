@@ -5,15 +5,51 @@
 
 Flutter android SMS inbox library based on [Flutter SMS](https://github.com/babariviere/flutter_sms).
 
-### Dependencies
+## Installation
 
-This package in turn uses the permission handler package for permission handling, [Permission Handler](https://pub.dev/packages/permission_handler).
+1. Add the package to your project by the following command:
 
-You need to add it to your project:
-
+```bash
+flutter pub add flutter_sms_inbox
 ```
-dependencies:
-  permission_handler: ^10.2.0
+
+2. Add `permission_handler` package to your project because this package uses it for permission handling:
+
+```bash
+flutter pub add permission_handler
+```
+
+3. Add the following permission to your `AndroidManifest.xml` file:
+
+```xml
+<uses-permission android:name="android.permission.READ_SMS"/>
+```
+
+## Permission Handling
+
+You need to request the SMS permission before dealing with the package. You can do it by using the `permission_handler` package. Here is an example of how to request the permission:
+
+```dart
+import 'package:permission_handler/permission_handler.dart';
+
+Future<bool> getSmsPermission() async {
+  var permissionStatus = await Permission.sms.status;
+
+  if (permissionStatus.isGranted) {
+    return true;
+  } else if (permissionStatus.isDenied) {
+    // We didn't ask for permission yet or the permission has been denied before but not permanently.
+    if (await Permission.sms.request().isGranted) {
+      return true;
+    }
+  } else if (permissionStatus.isPermanentlyDenied) {
+    // The user opted to never again see the permission request dialog for this
+    // app. The only way to change the permission's status now is to let the
+    // user manually enable it in the system settings.
+    openAppSettings();
+  }
+  return false;
+}
 ```
 
 ## Querying SMS messages
