@@ -19,7 +19,7 @@ flutter pub add flutter_sms_inbox
 flutter pub add permission_handler
 ```
 
-3. Add the following permissions to your `AndroidManifest.xml` file:
+3. Add the following permission to your `AndroidManifest.xml` file:
 
 ```xml
 <uses-permission android:name="android.permission.READ_SMS"/>
