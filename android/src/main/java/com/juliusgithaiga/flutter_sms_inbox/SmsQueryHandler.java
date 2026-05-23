@@ -2,12 +2,15 @@ package com.juliusgithaiga.flutter_sms_inbox;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import io.flutter.plugin.common.MethodChannel;
 
 public class SmsQueryHandler {
+
+    private static final String TAG = "SmsQueryHandler";
 
     private final Context applicationContext;
     private final MethodChannel.Result result;
@@ -30,42 +33,52 @@ public class SmsQueryHandler {
 
     void handle() {
         ArrayList<JSONObject> list = new ArrayList<>();
-        Cursor cursor = this.applicationContext.getContentResolver().query(this.request.toUri(), null, null, null, null);
-        if (cursor == null) {
-            result.error("no_cursor", "flutter_sms_inbox plugin requires cursor to resolve content", null);
-            return;
-        }
+        Cursor cursor = null;
+        try {
+            cursor = this.applicationContext.getContentResolver().query(this.request.toUri(), null, null, null, null);
+            if (cursor == null) {
+                result.error("no_cursor", "flutter_sms_inbox plugin requires cursor to resolve content", null);
+                return;
+            }
 
-        if (!cursor.moveToFirst()) {
-            cursor.close();
+            if (!cursor.moveToFirst()) {
+                result.success(list);
+                return;
+            }
+
+            do {
+                JSONObject obj = readSms(cursor);
+                try {
+                    if (threadId >= 0 && obj.getInt("thread_id") != threadId) {
+                        continue;
+                    }
+                    if (address != null && !obj.getString("address").equals(address)) {
+                        continue;
+                    }
+                } catch (JSONException e) {
+                    Log.w(TAG, "Skipping malformed SMS row while filtering", e);
+                }
+
+                if (start > 0) {
+                    start--;
+                    continue;
+                }
+                list.add(obj);
+                if (count > 0) {
+                    count--;
+                }
+            } while (cursor.moveToNext() && count != 0);
+
             result.success(list);
-            return;
+        } catch (SecurityException e) {
+            result.error("permission_denied", "READ_SMS permission denied or unavailable", null);
+        } catch (Exception e) {
+            result.error("query_failed", "Failed to query SMS content provider", null);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
-
-        do {
-            JSONObject obj = readSms(cursor);
-            try {
-                if (threadId >= 0 && obj.getInt("thread_id") != threadId) {
-                    continue;
-                }
-                if (address != null && !obj.getString("address").equals(address)) {
-                    continue;
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            if (start > 0) {
-                start--;
-                continue;
-            }
-            list.add(obj);
-            if (count > 0) {
-                count--;
-            }
-        } while (cursor.moveToNext() && count != 0);
-        cursor.close();
-        result.success(list);
     }
 
     private JSONObject readSms(Cursor cursor) {
@@ -80,7 +93,7 @@ public class SmsQueryHandler {
                     res.put(cursor.getColumnName(i), cursor.getInt(i));
                 }
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.w(TAG, "Skipping malformed SMS column: " + cursor.getColumnName(i), e);
             }
         }
         return res;

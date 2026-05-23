@@ -52,6 +52,12 @@ Future<bool> getSmsPermission() async {
 }
 ```
 
+## Security notes
+
+- This plugin reads sensitive user data (SMS metadata and message body). Request `READ_SMS` only when needed and explain the purpose clearly to users.
+- Do not log, persist, or transmit SMS message content unless your app has a clear product and compliance need.
+- Handle permission denial gracefully. Calls may fail if SMS permission is revoked or restricted by device policy.
+
 ## Querying SMS messages
 
 Add the import statement for sms and create an instance of the SmsQuery class:
