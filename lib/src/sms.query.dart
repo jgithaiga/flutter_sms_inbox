@@ -1,4 +1,4 @@
-part of flutter_sms_inbox;
+part of 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 
 class SmsQuery {
   static SmsQuery? instance;
