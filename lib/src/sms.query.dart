@@ -113,15 +113,29 @@ class SmsQuery {
       }
     }
 
+    int? remainingCount;
+    if (count != null && count > 0) {
+      remainingCount = count;
+    }
+
     List<SmsMessage> result = [];
     for (var kind in uniqueKinds) {
-      result.addAll(await _querySms(
+      final List<SmsMessage> fetched = await _querySms(
         start: start,
-        count: count,
+        count: remainingCount ?? count,
         address: sanitizedAddress,
         threadId: threadId,
         kind: kind,
-      ));
+      );
+
+      result.addAll(fetched);
+
+      if (remainingCount != null) {
+        remainingCount -= fetched.length;
+        if (remainingCount <= 0) {
+          break;
+        }
+      }
     }
 
     if (sort == true) {
