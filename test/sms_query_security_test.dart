@@ -92,4 +92,36 @@ void main() {
       ),
     );
   });
+
+  test('querySms maps kinds to platform methods and message kinds', () async {
+    final List<String> calledMethods = <String>[];
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
+      calledMethods.add(call.method);
+      return <Map<String, dynamic>>[
+        <String, dynamic>{
+          '_id': calledMethods.length,
+          'thread_id': 7,
+          'address': '+1234567890',
+          'body': 'Hello',
+          'read': 1,
+          'date': 1700000000000,
+          'date_sent': 1700000000000,
+          'sub_id': 0,
+        }
+      ];
+    });
+
+    final SmsQuery query = SmsQuery();
+    final List<SmsMessage> messages = await query.querySms(
+      kinds: const [SmsQueryKind.inbox, SmsQueryKind.sent, SmsQueryKind.draft],
+    );
+
+    expect(calledMethods, <String>['getInbox', 'getSent', 'getDraft']);
+    expect(messages.length, 3);
+    expect(messages[0].kind, SmsMessageKind.received);
+    expect(messages[1].kind, SmsMessageKind.sent);
+    expect(messages[2].kind, SmsMessageKind.draft);
+  });
 }
