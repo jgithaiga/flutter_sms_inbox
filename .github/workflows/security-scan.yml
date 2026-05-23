@@ -11,6 +11,8 @@ on:
 jobs:
   osv-scan:
     runs-on: ubuntu-latest
+    env:
+      OSV_SCANNER_IMAGE: ghcr.io/google/osv-scanner@sha256:64e86bec6df2466feea5137fc7c78fb3b7c21ec077f014d7130f64810e50676b
 
     steps:
       - uses: actions/checkout@v4

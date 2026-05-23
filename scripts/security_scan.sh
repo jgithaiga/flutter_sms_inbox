@@ -6,6 +6,8 @@ cd "$ROOT_DIR"
 
 LOCKFILES=("pubspec.lock" "example/pubspec.lock")
 SEVERITY="HIGH,CRITICAL"
+DEFAULT_OSV_SCANNER_IMAGE="ghcr.io/google/osv-scanner@sha256:64e86bec6df2466feea5137fc7c78fb3b7c21ec077f014d7130f64810e50676b"
+OSV_SCANNER_IMAGE="${OSV_SCANNER_IMAGE:-$DEFAULT_OSV_SCANNER_IMAGE}"
 
 build_local_severity_args() {
   local help_text
@@ -26,7 +28,7 @@ build_local_severity_args() {
 
 build_docker_severity_args() {
   local help_text
-  help_text="$(docker run --rm ghcr.io/google/osv-scanner:latest scan --help 2>&1 || true)"
+  help_text="$(docker run --rm "$OSV_SCANNER_IMAGE" scan --help 2>&1 || true)"
 
   if echo "$help_text" | grep -q -- "--severity"; then
     echo "--severity $SEVERITY"
@@ -59,20 +61,20 @@ scan_with_docker() {
   local lockfile="$1"
   local severity_args
   severity_args="$(build_docker_severity_args)"
-  echo "Scanning $lockfile with osv-scanner Docker image"
+  echo "Scanning $lockfile with osv-scanner Docker image: $OSV_SCANNER_IMAGE"
   if [[ -n "$severity_args" ]]; then
     # shellcheck disable=SC2086
     docker run --rm \
       -v "$ROOT_DIR:/src" \
       -w /src \
-      ghcr.io/google/osv-scanner:latest \
+      "$OSV_SCANNER_IMAGE" \
       scan --lockfile "$lockfile" $severity_args
   else
     echo "Warning: this Docker osv-scanner image does not support severity filtering; scanning all severities."
     docker run --rm \
       -v "$ROOT_DIR:/src" \
       -w /src \
-      ghcr.io/google/osv-scanner:latest \
+      "$OSV_SCANNER_IMAGE" \
       scan --lockfile "$lockfile"
   fi
 }
