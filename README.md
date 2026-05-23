@@ -101,6 +101,13 @@ For safety, queries are bounded in the Dart layer:
 
 The Android native layer also applies a defensive fallback cap of `1000` messages if requests arrive with unbounded or oversized values.
 
+## Privacy-safe usage patterns
+
+- Keep queries narrow: always set `count` and use `address`/`threadId` filters where possible.
+- Avoid rendering full SMS bodies by default in UI. Prefer a masked preview and add explicit user action before showing full content.
+- Do not log SMS body or sender details in production builds.
+- Do not persist or transmit SMS content unless it is strictly required and compliant with your product/privacy obligations.
+
 You can also query all the sms messages sent and received from a specific contact:
 
 ```

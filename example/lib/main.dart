@@ -16,6 +16,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final SmsQuery _query = SmsQuery();
   List<SmsMessage> _messages = [];
+  bool _showMessageBody = false;
 
   @override
   void initState() {
@@ -32,12 +33,26 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         appBar: AppBar(
           title: const Text('SMS Inbox Example'),
+          actions: [
+            IconButton(
+              tooltip: _showMessageBody
+                  ? 'Hide message body'
+                  : 'Show message body (debug)',
+              onPressed: () {
+                setState(() => _showMessageBody = !_showMessageBody);
+              },
+              icon: Icon(
+                _showMessageBody ? Icons.visibility_off : Icons.visibility,
+              ),
+            ),
+          ],
         ),
         body: Container(
           padding: const EdgeInsets.all(10.0),
           child: _messages.isNotEmpty
               ? _MessagesListView(
                   messages: _messages,
+                  showMessageBody: _showMessageBody,
                 )
               : Center(
                   child: Text(
@@ -59,7 +74,6 @@ class _MyAppState extends State<MyApp> {
                 // address: '+254712345789',
                 count: 10,
               );
-              debugPrint('sms inbox messages: ${messages.length}');
 
               setState(() => _messages = messages);
             } else {
@@ -77,9 +91,18 @@ class _MessagesListView extends StatelessWidget {
   const _MessagesListView({
     Key? key,
     required this.messages,
+    required this.showMessageBody,
   }) : super(key: key);
 
   final List<SmsMessage> messages;
+  final bool showMessageBody;
+
+  String _privacySafeBodyPreview(String? body) {
+    if (body == null || body.trim().isEmpty) {
+      return 'Message hidden for privacy';
+    }
+    return 'Message hidden for privacy (${body.length} chars)';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +114,11 @@ class _MessagesListView extends StatelessWidget {
 
         return ListTile(
           title: Text('${message.sender} [${message.date}]'),
-          subtitle: Text('${message.body}'),
+          subtitle: Text(
+            showMessageBody
+                ? (message.body ?? '')
+                : _privacySafeBodyPreview(message.body),
+          ),
         );
       },
     );
