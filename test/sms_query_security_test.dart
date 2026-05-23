@@ -82,6 +82,75 @@ void main() {
     expect(capturedCall, isNull);
   });
 
+  test('querySms trims address before platform call', () async {
+    MethodCall? capturedCall;
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
+      capturedCall = call;
+      return <Map<String, dynamic>>[];
+    });
+
+    final SmsQuery query = SmsQuery();
+    await query.querySms(
+      address: '  +1234567890  ',
+      kinds: const [SmsQueryKind.inbox],
+    );
+
+    final Map<dynamic, dynamic> args =
+        capturedCall!.arguments as Map<dynamic, dynamic>;
+    expect(args['address'], '+1234567890');
+  });
+
+  test('querySms omits whitespace-only address', () async {
+    MethodCall? capturedCall;
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
+      capturedCall = call;
+      return <Map<String, dynamic>>[];
+    });
+
+    final SmsQuery query = SmsQuery();
+    await query.querySms(
+      address: '   ',
+      kinds: const [SmsQueryKind.inbox],
+    );
+
+    final Map<dynamic, dynamic> args =
+        capturedCall!.arguments as Map<dynamic, dynamic>;
+    expect(args.containsKey('address'), isFalse);
+  });
+
+  test('querySms de-duplicates kinds before platform calls', () async {
+    final List<String> calledMethods = <String>[];
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
+      calledMethods.add(call.method);
+      return <Map<String, dynamic>>[
+        <String, dynamic>{
+          '_id': calledMethods.length,
+          'thread_id': 1,
+          'address': '+100',
+          'body': 'ok',
+          'read': 1,
+          'date': 1700000000000,
+          'date_sent': 1700000000000,
+          'sub_id': 0,
+        }
+      ];
+    });
+
+    final SmsQuery query = SmsQuery();
+    final List<SmsMessage> messages = await query.querySms(
+      kinds: const [SmsQueryKind.inbox, SmsQueryKind.inbox, SmsQueryKind.sent],
+    );
+
+    expect(calledMethods, <String>['getInbox', 'getSent']);
+    expect(messages.length, 2);
+  });
+
   test('querySms forwards permission_denied PlatformException', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(queryChannel, (MethodCall call) async {

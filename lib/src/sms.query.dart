@@ -100,12 +100,25 @@ class SmsQuery {
       );
     }
 
+    final String? normalizedAddress = address?.trim();
+    final String? sanitizedAddress =
+        (normalizedAddress == null || normalizedAddress.isEmpty)
+            ? null
+            : normalizedAddress;
+
+    final List<SmsQueryKind> uniqueKinds = <SmsQueryKind>[];
+    for (final SmsQueryKind kind in kinds) {
+      if (!uniqueKinds.contains(kind)) {
+        uniqueKinds.add(kind);
+      }
+    }
+
     List<SmsMessage> result = [];
-    for (var kind in kinds) {
+    for (var kind in uniqueKinds) {
       result.addAll(await _querySms(
         start: start,
         count: count,
-        address: address,
+        address: sanitizedAddress,
         threadId: threadId,
         kind: kind,
       ));
