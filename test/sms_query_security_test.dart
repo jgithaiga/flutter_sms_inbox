@@ -304,6 +304,79 @@ void main() {
     expect(args['count'], 1000);
   });
 
+  test('querySms uses default capped count when count is negative', () async {
+    MethodCall? capturedCall;
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
+      capturedCall = call;
+      return <Map<String, dynamic>>[];
+    });
+
+    final SmsQuery query = SmsQuery();
+    await query.querySms(
+      count: -999,
+      kinds: const [SmsQueryKind.inbox],
+    );
+
+    final Map<dynamic, dynamic> args =
+        capturedCall!.arguments as Map<dynamic, dynamic>;
+    expect(args['count'], 200);
+  });
+
+  test('querySms clamps oversized count without start to max window', () async {
+    MethodCall? capturedCall;
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
+      capturedCall = call;
+      return <Map<String, dynamic>>[];
+    });
+
+    final SmsQuery query = SmsQuery();
+    await query.querySms(
+      count: 5000,
+      kinds: const [SmsQueryKind.inbox],
+    );
+
+    final Map<dynamic, dynamic> args =
+        capturedCall!.arguments as Map<dynamic, dynamic>;
+    expect(args['count'], 1000);
+  });
+
+  test(
+      'querySms carries large start across kinds and returns empty when needed',
+      () async {
+    final List<String> calledMethods = <String>[];
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
+      calledMethods.add(call.method);
+      return <Map<String, dynamic>>[
+        <String, dynamic>{
+          '_id': calledMethods.length,
+          'thread_id': calledMethods.length,
+          'address': '+111',
+          'body': 'msg-${calledMethods.length}',
+          'read': 1,
+          'date': 1700000000000 + calledMethods.length,
+          'date_sent': 1700000000000 + calledMethods.length,
+          'sub_id': 0,
+        }
+      ];
+    });
+
+    final SmsQuery query = SmsQuery();
+    final List<SmsMessage> messages = await query.querySms(
+      start: 5000,
+      count: 2,
+      kinds: const [SmsQueryKind.inbox, SmsQueryKind.sent, SmsQueryKind.draft],
+    );
+
+    expect(messages, isEmpty);
+    expect(calledMethods, <String>['getInbox', 'getSent', 'getDraft']);
+  });
+
   test('querySms forwards permission_denied PlatformException', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
