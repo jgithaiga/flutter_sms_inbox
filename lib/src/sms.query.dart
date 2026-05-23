@@ -19,16 +19,12 @@ class SmsQuery {
 
   /// Wrapper to query one kind at a time
   Future<List<SmsMessage>> _querySms({
-    int? start,
     int? count,
     String? address,
     int? threadId,
     SmsQueryKind kind = SmsQueryKind.inbox,
   }) async {
     final Map<String, Object> arguments = <String, Object>{};
-    if (start != null && start >= 0) {
-      arguments["start"] = start;
-    }
     if (count != null && count > 0) {
       arguments["count"] = count;
     }
@@ -118,20 +114,42 @@ class SmsQuery {
       remainingCount = count;
     }
 
+    int remainingStart = 0;
+    if (start != null && start > 0) {
+      remainingStart = start;
+    }
+
     List<SmsMessage> result = [];
     for (var kind in uniqueKinds) {
+      int? requestCount;
+      if (remainingCount != null) {
+        requestCount = remainingCount + remainingStart;
+      }
+
       final List<SmsMessage> fetched = await _querySms(
-        start: start,
-        count: remainingCount ?? count,
+        count: requestCount,
         address: sanitizedAddress,
         threadId: threadId,
         kind: kind,
       );
 
-      result.addAll(fetched);
+      int startIndex = 0;
+      if (remainingStart > 0) {
+        startIndex = remainingStart.clamp(0, fetched.length);
+        remainingStart -= startIndex;
+      }
+
+      List<SmsMessage> effective =
+          (startIndex == 0) ? fetched : fetched.sublist(startIndex);
+
+      if (remainingCount != null && effective.length > remainingCount) {
+        effective = effective.sublist(0, remainingCount);
+      }
+
+      result.addAll(effective);
 
       if (remainingCount != null) {
-        remainingCount -= fetched.length;
+        remainingCount -= effective.length;
         if (remainingCount <= 0) {
           break;
         }

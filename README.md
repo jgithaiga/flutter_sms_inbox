@@ -91,6 +91,9 @@ await query.querySms(
     kinds: [SmsQueryKind.inbox, SmsQueryKind.sent],
 );
 ```
+
+`start` and `count` are applied globally across the ordered `kinds` list (not per kind). For example, with `kinds: [SmsQueryKind.inbox, SmsQueryKind.sent]`, `start: 2`, and `count: 5`, the query skips the first 2 messages across inbox then sent, and returns up to the next 5 messages from that combined ordered sequence.
+
 You can also query all the sms messages sent and received from a specific contact:
 
 ```

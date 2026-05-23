@@ -206,6 +206,65 @@ void main() {
     expect(calledMethods, <String>['getInbox']);
   });
 
+  test('querySms applies start as global offset across kinds', () async {
+    final List<Map<dynamic, dynamic>> capturedArgs = <Map<dynamic, dynamic>>[];
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
+      capturedArgs.add(call.arguments as Map<dynamic, dynamic>);
+
+      if (call.method == 'getInbox') {
+        return <Map<String, dynamic>>[
+          <String, dynamic>{
+            '_id': 1,
+            'thread_id': 1,
+            'address': '+111',
+            'body': 'a',
+            'read': 1,
+            'date': 1700000000000,
+            'date_sent': 1700000000000,
+            'sub_id': 0,
+          },
+          <String, dynamic>{
+            '_id': 2,
+            'thread_id': 1,
+            'address': '+111',
+            'body': 'b',
+            'read': 1,
+            'date': 1700000000001,
+            'date_sent': 1700000000001,
+            'sub_id': 0,
+          },
+        ];
+      }
+
+      return <Map<String, dynamic>>[
+        <String, dynamic>{
+          '_id': 3,
+          'thread_id': 2,
+          'address': '+222',
+          'body': 'c',
+          'read': 1,
+          'date': 1700000000002,
+          'date_sent': 1700000000002,
+          'sub_id': 0,
+        }
+      ];
+    });
+
+    final SmsQuery query = SmsQuery();
+    final List<SmsMessage> messages = await query.querySms(
+      start: 2,
+      count: 1,
+      kinds: const [SmsQueryKind.inbox, SmsQueryKind.sent],
+    );
+
+    expect(messages.length, 1);
+    expect(messages.first.id, 3);
+    expect(capturedArgs.first['start'], isNull);
+    expect(capturedArgs.first['count'], 3);
+  });
+
   test('querySms forwards permission_denied PlatformException', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
