@@ -120,8 +120,8 @@ class SmsQuery {
 
     List<SmsMessage> result = [];
     for (var kind in uniqueKinds) {
-      final int requestCount = (remainingCount + remainingStart)
-          .clamp(1, _maxQueryWindow);
+      final int requestCount =
+          (remainingCount + remainingStart).clamp(1, _maxQueryWindow);
 
       final List<SmsMessage> fetched = await _querySms(
         count: requestCount,
