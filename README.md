@@ -94,6 +94,11 @@ await query.querySms(
 
 `start` and `count` are applied globally across the ordered `kinds` list (not per kind). For example, with `kinds: [SmsQueryKind.inbox, SmsQueryKind.sent]`, `start: 2`, and `count: 5`, the query skips the first 2 messages across inbox then sent, and returns up to the next 5 messages from that combined ordered sequence.
 
+For safety, queries are bounded in the Dart layer:
+
+- If `count` is omitted (or negative), the query uses a default cap of `200` messages.
+- Oversized request windows are clamped to `1000` messages before native queries are made.
+
 You can also query all the sms messages sent and received from a specific contact:
 
 ```

@@ -16,7 +16,7 @@ void main() {
     SmsQuery.instance = null;
   });
 
-  test('querySms strips invalid filter arguments before platform call',
+  test('querySms sanitizes invalid filter arguments before platform call',
       () async {
     MethodCall? capturedCall;
 
@@ -42,9 +42,26 @@ void main() {
     final Map<dynamic, dynamic> args =
         capturedCall!.arguments as Map<dynamic, dynamic>;
     expect(args.containsKey('start'), isFalse);
-    expect(args.containsKey('count'), isFalse);
+    expect(args['count'], 200);
     expect(args.containsKey('thread_id'), isFalse);
     expect(args.containsKey('address'), isFalse);
+  });
+
+  test('querySms uses default capped count when count is omitted', () async {
+    MethodCall? capturedCall;
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
+      capturedCall = call;
+      return <Map<String, dynamic>>[];
+    });
+
+    final SmsQuery query = SmsQuery();
+    await query.querySms(kinds: const [SmsQueryKind.inbox]);
+
+    final Map<dynamic, dynamic> args =
+        capturedCall!.arguments as Map<dynamic, dynamic>;
+    expect(args['count'], 200);
   });
 
   test('querySms throws invalid_arguments when kinds is empty', () {
@@ -263,6 +280,28 @@ void main() {
     expect(messages.first.id, 3);
     expect(capturedArgs.first['start'], isNull);
     expect(capturedArgs.first['count'], 3);
+  });
+
+  test('querySms clamps oversized request window before platform call',
+      () async {
+    MethodCall? capturedCall;
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
+      capturedCall = call;
+      return <Map<String, dynamic>>[];
+    });
+
+    final SmsQuery query = SmsQuery();
+    await query.querySms(
+      start: 900,
+      count: 500,
+      kinds: const [SmsQueryKind.inbox],
+    );
+
+    final Map<dynamic, dynamic> args =
+        capturedCall!.arguments as Map<dynamic, dynamic>;
+    expect(args['count'], 1000);
   });
 
   test('querySms forwards permission_denied PlatformException', () async {
