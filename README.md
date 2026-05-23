@@ -58,6 +58,14 @@ Future<bool> getSmsPermission() async {
 - Do not log, persist, or transmit SMS message content unless your app has a clear product and compliance need.
 - Handle permission denial gracefully. Calls may fail if SMS permission is revoked or restricted by device policy.
 
+### Error handling
+
+Query calls can return structured platform errors:
+
+- `permission_denied`: `READ_SMS` was denied or unavailable.
+- `invalid_arguments`: one or more query arguments had an unexpected type.
+- `query_failed`: an unexpected platform failure occurred while querying SMS.
+
 ## Querying SMS messages
 
 Add the import statement for sms and create an instance of the SmsQuery class:

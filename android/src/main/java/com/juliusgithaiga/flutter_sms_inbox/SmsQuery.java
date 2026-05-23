@@ -1,11 +1,14 @@
 package com.juliusgithaiga.flutter_sms_inbox;
 
 import android.content.Context;
+import android.util.Log;
 import androidx.annotation.NonNull;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
 public class SmsQuery implements MethodChannel.MethodCallHandler {
+
+    private static final String TAG = "SmsQuery";
 
     private final Context applicationContext;
 
@@ -15,10 +18,10 @@ public class SmsQuery implements MethodChannel.MethodCallHandler {
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
-        int start = 0;
-        int count = -1;
-        int threadId = -1;
-        String address = null;
+        int start;
+        int count;
+        int threadId;
+        String address;
         SmsQueryRequest request;
         switch (call.method) {
             case "getInbox":
@@ -35,21 +38,47 @@ public class SmsQuery implements MethodChannel.MethodCallHandler {
                 return;
         }
 
-        if (call.hasArgument("start")) {
-            start = call.argument("start");
-        }
-        if (call.hasArgument("count")) {
-            count = call.argument("count");
-        }
-        if (call.hasArgument("thread_id")) {
-            threadId = call.argument("thread_id");
-        }
-        if (call.hasArgument("address")) {
-            address = call.argument("address");
+        try {
+            start = getIntArg(call, "start", 0);
+            count = getIntArg(call, "count", -1);
+            threadId = getIntArg(call, "thread_id", -1);
+            address = getStringArg(call, "address", null);
+        } catch (IllegalArgumentException e) {
+            Log.w(TAG, "Invalid method arguments for " + call.method, e);
+            result.error("invalid_arguments", e.getMessage(), null);
+            return;
         }
 
         SmsQueryHandler smsQueryHandler = new SmsQueryHandler(
                 this.applicationContext, result, request, start, count, threadId, address);
         smsQueryHandler.handle();
+    }
+
+    private int getIntArg(MethodCall call, String key, int defaultValue) {
+        if (!call.hasArgument(key)) {
+            return defaultValue;
+        }
+        Object value = call.argument(key);
+        if (value == null) {
+            return defaultValue;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        throw new IllegalArgumentException("Argument '" + key + "' must be a number");
+    }
+
+    private String getStringArg(MethodCall call, String key, String defaultValue) {
+        if (!call.hasArgument(key)) {
+            return defaultValue;
+        }
+        Object value = call.argument(key);
+        if (value == null) {
+            return defaultValue;
+        }
+        if (value instanceof String) {
+            return (String) value;
+        }
+        throw new IllegalArgumentException("Argument '" + key + "' must be a string");
     }
 }
