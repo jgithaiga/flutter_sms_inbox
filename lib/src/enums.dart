@@ -1,4 +1,4 @@
-part of 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
+part of '../flutter_sms_inbox.dart';
 
 enum SmsMessageState {
   sending,
