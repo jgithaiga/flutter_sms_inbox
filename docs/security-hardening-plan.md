@@ -34,8 +34,8 @@ This plan tracks follow-up implementation work from the latest repository securi
 | SH-06 | Remove or gate debug logs in example app for release-safe guidance | P2 | done | unassigned | 2026-06-03 | Code review + grep check for debug logs | Removed nonessential message-count debug logging from example app |
 | SH-07 | Add README section for fetch limits and privacy-safe usage patterns | P1 | done | unassigned | 2026-06-03 | Docs review | Added explicit privacy-safe usage guidance section in README |
 | SH-08 | Add vulnerability scan command and CI workflow (OSV or equivalent) | P1 | done | unassigned | 2026-06-07 | CI run artifact + failing on critical/high | Added `scripts/security_scan.sh` and `.github/workflows/security-scan.yml` |
-| SH-09 | Perform dependency refresh plan for outdated/discontinued dev tooling | P2 | todo | unassigned | 2026-06-10 | `flutter pub outdated` delta + successful tests/analyze | Track compatibility constraints and migration notes |
-| SH-10 | Add periodic security review checklist and release gate | P2 | todo | unassigned | 2026-06-10 | Checklist committed and referenced in release flow | Include permissions, logging, dependency scan, docs checks |
+| SH-09 | Perform dependency refresh plan for outdated/discontinued dev tooling | P2 | done | unassigned | 2026-06-10 | `flutter pub outdated` delta + successful tests/analyze | Added dependency report script and refresh-plan document |
+| SH-10 | Add periodic security review checklist and release gate | P2 | done | unassigned | 2026-06-10 | Checklist committed and referenced in release flow | Added release checklist document and linked usage in README |
 
 ## Work Breakdown by Phase
 
@@ -80,3 +80,5 @@ flutter pub outdated --no-transitive
 - 2026-05-23: SH-04 completed with extreme boundary regression tests in Dart query suite.
 - 2026-05-23: SH-05, SH-06, and SH-07 completed with example privacy hardening and README guidance updates.
 - 2026-05-23: SH-08 completed with local scan script and CI workflow for OSV lockfile scanning.
+- 2026-05-23: SH-09 completed with dependency report script and refresh-plan document.
+- 2026-05-23: SH-10 completed with security release checklist and README release-gate references.
