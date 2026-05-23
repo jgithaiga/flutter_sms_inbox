@@ -102,12 +102,7 @@ class SmsQuery {
             ? null
             : normalizedAddress;
 
-    final List<SmsQueryKind> uniqueKinds = <SmsQueryKind>[];
-    for (final SmsQueryKind kind in kinds) {
-      if (!uniqueKinds.contains(kind)) {
-        uniqueKinds.add(kind);
-      }
-    }
+    final Set<SmsQueryKind> uniqueKinds = <SmsQueryKind>{...kinds};
 
     int? remainingCount;
     if (count != null && count > 0) {
