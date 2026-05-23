@@ -164,4 +164,68 @@ void main() {
       ),
     );
   });
+
+  test('querySms accepts mixed primitive payload types', () async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
+      return <Map<String, dynamic>>[
+        <String, dynamic>{
+          '_id': '42',
+          'thread_id': '7',
+          'address': 12345,
+          'body': 67890,
+          'read': '1',
+          'date': '1700000000000',
+          'date_sent': 1700000000001,
+          'sub_id': 2.0,
+        }
+      ];
+    });
+
+    final SmsQuery query = SmsQuery();
+    final List<SmsMessage> messages = await query.querySms(
+      kinds: const [SmsQueryKind.inbox],
+    );
+
+    expect(messages.length, 1);
+    final SmsMessage message = messages.first;
+    expect(message.id, 42);
+    expect(message.threadId, 7);
+    expect(message.address, '12345');
+    expect(message.body, '67890');
+    expect(message.read, isTrue);
+    expect(message.date, isNotNull);
+    expect(message.dateSent, isNotNull);
+    expect(message.subId, 2);
+  });
+
+  test('querySms sort does not throw when id is missing', () async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
+      return <Map<String, dynamic>>[
+        <String, dynamic>{
+          'thread_id': 3,
+          'address': '+1234567890',
+          'body': 'no id',
+          'read': true,
+        },
+        <String, dynamic>{
+          '_id': 9,
+          'thread_id': 3,
+          'address': '+1234567890',
+          'body': 'with id',
+          'read': false,
+        },
+      ];
+    });
+
+    final SmsQuery query = SmsQuery();
+    final List<SmsMessage> messages = await query.querySms(
+      kinds: const [SmsQueryKind.inbox],
+      sort: true,
+    );
+
+    expect(messages.length, 2);
+    expect(messages.first.id, 9);
+  });
 }

@@ -16,28 +16,73 @@ class SmsMessage implements Comparable<SmsMessage> {
       StreamController<SmsMessageState>();
 
   SmsMessage.fromJson(Map data) {
-    address = data["address"];
-    body = data["body"];
-    subId = data["sub_id"];
+    address = data["address"]?.toString();
+    body = data["body"]?.toString();
+    subId = _asInt(data["sub_id"]);
 
     if (data.containsKey("_id")) {
-      id = data["_id"];
+      id = _asInt(data["_id"]);
     }
     if (data.containsKey("thread_id")) {
-      threadId = data["thread_id"];
+      threadId = _asInt(data["thread_id"]);
     }
     if (data.containsKey("read")) {
-      read = (data["read"].toInt() == 1);
+      read = _asBool(data["read"]);
     }
     if (data.containsKey("kind")) {
       kind = data["kind"];
     }
     if (data.containsKey("date")) {
-      date = DateTime.fromMillisecondsSinceEpoch(data["date"]);
+      final int? timestamp = _asInt(data["date"]);
+      if (timestamp != null) {
+        date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      }
     }
     if (data.containsKey("date_sent")) {
-      dateSent = DateTime.fromMillisecondsSinceEpoch(data["date_sent"]);
+      final int? timestamp = _asInt(data["date_sent"]);
+      if (timestamp != null) {
+        dateSent = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      }
     }
+  }
+
+  static int? _asInt(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+    if (value is int) {
+      return value;
+    }
+    if (value is num) {
+      return value.toInt();
+    }
+    if (value is String) {
+      return int.tryParse(value);
+    }
+    return null;
+  }
+
+  static bool? _asBool(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+    if (value is bool) {
+      return value;
+    }
+    final int? parsedInt = _asInt(value);
+    if (parsedInt != null) {
+      return parsedInt == 1;
+    }
+    if (value is String) {
+      final String normalized = value.toLowerCase();
+      if (normalized == 'true') {
+        return true;
+      }
+      if (normalized == 'false') {
+        return false;
+      }
+    }
+    return null;
   }
 
   /// Convert SMS to map
@@ -86,6 +131,8 @@ class SmsMessage implements Comparable<SmsMessage> {
 
   @override
   int compareTo(SmsMessage other) {
-    return other.id! - id!;
+    final int thisId = id ?? -1;
+    final int otherId = other.id ?? -1;
+    return otherId - thisId;
   }
 }
