@@ -1,0 +1,24 @@
+name: Security Scan
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  osv-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run OSV scan on lockfiles
+        uses: google/osv-scanner-action@v2
+        with:
+          scan-args: |-
+            --lockfile=pubspec.lock
+            --lockfile=example/pubspec.lock
+            --severity=HIGH,CRITICAL

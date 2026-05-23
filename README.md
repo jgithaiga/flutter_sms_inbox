@@ -67,6 +67,16 @@ Query calls can return structured platform errors:
 - `invalid_response`: platform returned an unexpected payload shape.
 - `query_failed`: an unexpected platform failure occurred while querying SMS.
 
+### Vulnerability scanning
+
+Run dependency vulnerability scans locally with:
+
+```bash
+bash scripts/security_scan.sh
+```
+
+CI also runs lockfile scans on pull requests and pushes using `.github/workflows/security-scan.yml`.
+
 ## Querying SMS messages
 
 Add the import statement for sms and create an instance of the SmsQuery class:
