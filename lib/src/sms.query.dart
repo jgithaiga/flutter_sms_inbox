@@ -25,7 +25,7 @@ class SmsQuery {
     int? threadId,
     SmsQueryKind kind = SmsQueryKind.inbox,
   }) async {
-    Map arguments = {};
+    final Map<String, Object> arguments = <String, Object>{};
     if (start != null && start >= 0) {
       arguments["start"] = start;
     }
@@ -52,14 +52,32 @@ class SmsQuery {
       msgKind = SmsMessageKind.draft;
     }
 
-    var snapshot = await _channel.invokeMethod(function, arguments);
-    return snapshot.map<SmsMessage>(
-      (var data) {
-        var msg = SmsMessage.fromJson(data);
-        msg.kind = msgKind;
-        return msg;
-      },
-    ).toList();
+    final dynamic snapshot = await _channel.invokeMethod(function, arguments);
+    return _decodeSnapshot(snapshot, msgKind);
+  }
+
+  List<SmsMessage> _decodeSnapshot(dynamic snapshot, SmsMessageKind msgKind) {
+    if (snapshot is! List) {
+      throw PlatformException(
+        code: 'invalid_response',
+        message: 'Expected a list response from platform query',
+      );
+    }
+
+    final List<SmsMessage> messages = <SmsMessage>[];
+    for (final dynamic item in snapshot) {
+      if (item is! Map) {
+        throw PlatformException(
+          code: 'invalid_response',
+          message: 'Expected each SMS item to be a map',
+        );
+      }
+      final SmsMessage msg = SmsMessage.fromJson(item);
+      msg.kind = msgKind;
+      messages.add(msg);
+    }
+
+    return messages;
   }
 
   /// Query a list of SMS

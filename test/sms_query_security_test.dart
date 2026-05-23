@@ -124,4 +124,44 @@ void main() {
     expect(messages[1].kind, SmsMessageKind.sent);
     expect(messages[2].kind, SmsMessageKind.draft);
   });
+
+  test('querySms throws invalid_response for non-list payload', () async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
+      return <String, dynamic>{'unexpected': true};
+    });
+
+    final SmsQuery query = SmsQuery();
+
+    expect(
+      () => query.querySms(kinds: const [SmsQueryKind.inbox]),
+      throwsA(
+        isA<PlatformException>().having(
+          (PlatformException e) => e.code,
+          'code',
+          'invalid_response',
+        ),
+      ),
+    );
+  });
+
+  test('querySms throws invalid_response for non-map item payload', () async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
+      return <dynamic>['invalid-item'];
+    });
+
+    final SmsQuery query = SmsQuery();
+
+    expect(
+      () => query.querySms(kinds: const [SmsQueryKind.inbox]),
+      throwsA(
+        isA<PlatformException>().having(
+          (PlatformException e) => e.code,
+          'code',
+          'invalid_response',
+        ),
+      ),
+    );
+  });
 }
