@@ -47,6 +47,21 @@ void main() {
     expect(args.containsKey('address'), isFalse);
   });
 
+  test('querySms throws invalid_arguments when kinds is empty', () {
+    final SmsQuery query = SmsQuery();
+
+    expect(
+      () => query.querySms(kinds: const <SmsQueryKind>[]),
+      throwsA(
+        isA<PlatformException>().having(
+          (PlatformException e) => e.code,
+          'code',
+          'invalid_arguments',
+        ),
+      ),
+    );
+  });
+
   test('querySms forwards permission_denied PlatformException', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(queryChannel, (MethodCall call) async {

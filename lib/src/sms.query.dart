@@ -89,6 +89,13 @@ class SmsQuery {
     List<SmsQueryKind> kinds = const [SmsQueryKind.inbox],
     bool sort = false,
   }) async {
+    if (kinds.isEmpty) {
+      throw PlatformException(
+        code: 'invalid_arguments',
+        message: 'Argument "kinds" must contain at least one query kind',
+      );
+    }
+
     List<SmsMessage> result = [];
     for (var kind in kinds) {
       result.addAll(await _querySms(
