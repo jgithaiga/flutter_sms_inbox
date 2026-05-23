@@ -69,4 +69,27 @@ void main() {
       ),
     );
   });
+
+  test('querySms forwards query_failed PlatformException', () async {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
+      throw PlatformException(
+        code: 'query_failed',
+        message: 'Failed to query SMS content provider',
+      );
+    });
+
+    final SmsQuery query = SmsQuery();
+
+    expect(
+      () => query.querySms(kinds: const [SmsQueryKind.inbox]),
+      throwsA(
+        isA<PlatformException>().having(
+          (PlatformException e) => e.code,
+          'code',
+          'query_failed',
+        ),
+      ),
+    );
+  });
 }
