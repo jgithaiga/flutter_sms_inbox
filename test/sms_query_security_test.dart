@@ -62,6 +62,26 @@ void main() {
     );
   });
 
+  test('querySms returns empty without platform call when count is zero',
+      () async {
+    MethodCall? capturedCall;
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(queryChannel, (MethodCall call) async {
+      capturedCall = call;
+      return <Map<String, dynamic>>[];
+    });
+
+    final SmsQuery query = SmsQuery();
+    final List<SmsMessage> result = await query.querySms(
+      count: 0,
+      kinds: const [SmsQueryKind.inbox],
+    );
+
+    expect(result, isEmpty);
+    expect(capturedCall, isNull);
+  });
+
   test('querySms forwards permission_denied PlatformException', () async {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(queryChannel, (MethodCall call) async {

@@ -89,6 +89,10 @@ class SmsQuery {
     List<SmsQueryKind> kinds = const [SmsQueryKind.inbox],
     bool sort = false,
   }) async {
+    if (count == 0) {
+      return <SmsMessage>[];
+    }
+
     if (kinds.isEmpty) {
       throw PlatformException(
         code: 'invalid_arguments',
