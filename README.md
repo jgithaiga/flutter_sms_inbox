@@ -99,6 +99,8 @@ For safety, queries are bounded in the Dart layer:
 - If `count` is omitted (or negative), the query uses a default cap of `200` messages.
 - Oversized request windows are clamped to `1000` messages before native queries are made.
 
+The Android native layer also applies a defensive fallback cap of `1000` messages if requests arrive with unbounded or oversized values.
+
 You can also query all the sms messages sent and received from a specific contact:
 
 ```
