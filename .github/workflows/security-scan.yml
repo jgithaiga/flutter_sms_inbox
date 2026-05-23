@@ -15,9 +15,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run OSV scan on lockfiles
-        uses: google/osv-scanner-action@v2
-        with:
-          scan-args: |-
-            --lockfile=pubspec.lock
-            --lockfile=example/pubspec.lock
+      - name: Run dependency vulnerability scan
+        run: bash scripts/security_scan.sh
