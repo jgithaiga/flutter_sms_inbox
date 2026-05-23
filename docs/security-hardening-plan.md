@@ -29,7 +29,7 @@ This plan tracks follow-up implementation work from the latest repository securi
 | SH-01 | Add a safe max cap for total messages fetched in Dart query path | P0 | done | unassigned | 2026-05-30 | Unit tests for clamping and no-overfetch behavior | Implemented default cap (`200`) and max window (`1000`) in Dart query path |
 | SH-02 | Validate and clamp `count + start` before passing to native query | P0 | done | unassigned | 2026-05-30 | Unit tests + analyzer clean | Request window now clamped before native query invocation |
 | SH-03 | Add native-side defensive cap fallback in `SmsQueryHandler` for unbounded requests | P1 | done | unassigned | 2026-06-03 | Android tests/manual validation | Implemented fallback cap (`1000`) for negative/oversized native counts |
-| SH-04 | Add regression tests for large start/count edge cases | P1 | in-progress | unassigned | 2026-06-03 | `flutter test` in security test suite | Added clamping coverage; boundary/extreme-path coverage still pending |
+| SH-04 | Add regression tests for large start/count edge cases | P1 | done | unassigned | 2026-06-03 | `flutter test` in security test suite | Added and validated extreme-path coverage for negative/oversized count and large start carry-over |
 | SH-05 | Privacy-harden example app: mask/truncate message bodies by default | P1 | todo | unassigned | 2026-06-03 | Manual run of example + snapshot review | Keep sample useful while reducing accidental sensitive-data exposure |
 | SH-06 | Remove or gate debug logs in example app for release-safe guidance | P2 | todo | unassigned | 2026-06-03 | Code review + grep check for debug logs | Prefer comments describing secure logging practices |
 | SH-07 | Add README section for fetch limits and privacy-safe usage patterns | P1 | todo | unassigned | 2026-06-03 | Docs review | Include examples with constrained `count` and minimization guidance |
@@ -77,3 +77,4 @@ flutter pub outdated --no-transitive
 - 2026-05-23: Initial plan created with prioritized tracker items from security review.
 - 2026-05-23: SH-01 and SH-02 implemented in Dart query path with tests; SH-04 moved to in-progress.
 - 2026-05-23: SH-03 implemented with native defensive fallback cap in Android query handler.
+- 2026-05-23: SH-04 completed with extreme boundary regression tests in Dart query suite.
