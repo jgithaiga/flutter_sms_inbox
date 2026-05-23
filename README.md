@@ -75,6 +75,8 @@ Run dependency vulnerability scans locally with:
 bash scripts/security_scan.sh
 ```
 
+The script auto-detects supported OSV flags across versions. If severity filtering flags are unavailable in your scanner version, it falls back to scanning all severities.
+
 CI also runs lockfile scans on pull requests and pushes using `.github/workflows/security-scan.yml`.
 
 ## Querying SMS messages

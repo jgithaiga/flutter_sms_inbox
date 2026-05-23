@@ -21,4 +21,3 @@ jobs:
           scan-args: |-
             --lockfile=pubspec.lock
             --lockfile=example/pubspec.lock
-            --severity=HIGH,CRITICAL
