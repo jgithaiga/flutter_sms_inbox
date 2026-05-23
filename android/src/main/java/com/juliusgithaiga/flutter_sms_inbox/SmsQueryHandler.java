@@ -11,6 +11,16 @@ import io.flutter.plugin.common.MethodChannel;
 public class SmsQueryHandler {
 
     private static final String TAG = "SmsQueryHandler";
+    private static final String[] PROJECTION = {
+            "_id",
+            "thread_id",
+            "address",
+            "body",
+            "read",
+            "date",
+            "date_sent",
+            "sub_id"
+    };
 
     private final Context applicationContext;
     private final MethodChannel.Result result;
@@ -35,7 +45,18 @@ public class SmsQueryHandler {
         ArrayList<JSONObject> list = new ArrayList<>();
         Cursor cursor = null;
         try {
-            cursor = this.applicationContext.getContentResolver().query(this.request.toUri(), null, null, null, null);
+            if (count == 0) {
+                result.success(list);
+                return;
+            }
+
+            cursor = this.applicationContext.getContentResolver().query(
+                    this.request.toUri(),
+                    PROJECTION,
+                    null,
+                    null,
+                    null
+            );
             if (cursor == null) {
                 result.error("no_cursor", "flutter_sms_inbox plugin requires cursor to resolve content", null);
                 return;
@@ -48,15 +69,16 @@ public class SmsQueryHandler {
 
             do {
                 JSONObject obj = readSms(cursor);
-                try {
-                    if (threadId >= 0 && obj.getInt("thread_id") != threadId) {
+                int rowThreadId = obj.optInt("thread_id", -1);
+                if (threadId >= 0 && rowThreadId != threadId) {
+                    continue;
+                }
+
+                if (address != null) {
+                    String rowAddress = obj.optString("address", null);
+                    if (rowAddress == null || !address.equals(rowAddress)) {
                         continue;
                     }
-                    if (address != null && !obj.getString("address").equals(address)) {
-                        continue;
-                    }
-                } catch (JSONException e) {
-                    Log.w(TAG, "Skipping malformed SMS row while filtering", e);
                 }
 
                 if (start > 0) {

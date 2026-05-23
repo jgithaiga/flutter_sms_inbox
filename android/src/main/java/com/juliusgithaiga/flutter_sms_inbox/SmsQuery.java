@@ -43,6 +43,16 @@ public class SmsQuery implements MethodChannel.MethodCallHandler {
             count = getIntArg(call, "count", -1);
             threadId = getIntArg(call, "thread_id", -1);
             address = getStringArg(call, "address", null);
+
+            if (start < 0) {
+                throw new IllegalArgumentException("Argument 'start' must be >= 0");
+            }
+            if (count < -1) {
+                throw new IllegalArgumentException("Argument 'count' must be -1 or >= 0");
+            }
+            if (threadId < -1) {
+                throw new IllegalArgumentException("Argument 'thread_id' must be -1 or >= 0");
+            }
         } catch (IllegalArgumentException e) {
             Log.w(TAG, "Invalid method arguments for " + call.method, e);
             result.error("invalid_arguments", e.getMessage(), null);
