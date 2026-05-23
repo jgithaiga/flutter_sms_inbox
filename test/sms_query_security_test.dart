@@ -228,4 +228,35 @@ void main() {
     expect(messages.length, 2);
     expect(messages.first.id, 9);
   });
+
+  test('SmsMessage supports both date_sent and dateSent input keys', () {
+    final SmsMessage fromSnake = SmsMessage.fromJson(<String, dynamic>{
+      'date_sent': '1700000000000',
+    });
+    final SmsMessage fromCamel = SmsMessage.fromJson(<String, dynamic>{
+      'dateSent': 1700000000001,
+    });
+
+    expect(fromSnake.dateSent, isNotNull);
+    expect(fromCamel.dateSent, isNotNull);
+  });
+
+  test('SmsMessage toMap includes both date_sent and dateSent', () {
+    final SmsMessage message = SmsMessage.fromJson(<String, dynamic>{
+      '_id': 1,
+      'date_sent': 1700000000000,
+    });
+
+    final Map<dynamic, dynamic> map = message.toMap;
+    expect(map['date_sent'], 1700000000000);
+    expect(map['dateSent'], 1700000000000);
+  });
+
+  test('SmsMessage read parser accepts trimmed string boolean', () {
+    final SmsMessage message = SmsMessage.fromJson(<String, dynamic>{
+      'read': ' TRUE ',
+    });
+
+    expect(message.read, isTrue);
+  });
 }

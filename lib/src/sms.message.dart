@@ -43,6 +43,11 @@ class SmsMessage implements Comparable<SmsMessage> {
       if (timestamp != null) {
         dateSent = DateTime.fromMillisecondsSinceEpoch(timestamp);
       }
+    } else if (data.containsKey("dateSent")) {
+      final int? timestamp = _asInt(data["dateSent"]);
+      if (timestamp != null) {
+        dateSent = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      }
     }
   }
 
@@ -74,7 +79,7 @@ class SmsMessage implements Comparable<SmsMessage> {
       return parsedInt == 1;
     }
     if (value is String) {
-      final String normalized = value.toLowerCase();
+      final String normalized = value.trim().toLowerCase();
       if (normalized == 'true') {
         return true;
       }
@@ -110,7 +115,9 @@ class SmsMessage implements Comparable<SmsMessage> {
       data["date"] = date!.millisecondsSinceEpoch;
     }
     if (dateSent != null) {
-      data["dateSent"] = dateSent!.millisecondsSinceEpoch;
+      final int timestamp = dateSent!.millisecondsSinceEpoch;
+      data["date_sent"] = timestamp;
+      data["dateSent"] = timestamp;
     }
     return data;
   }

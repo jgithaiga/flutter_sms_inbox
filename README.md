@@ -64,6 +64,7 @@ Query calls can return structured platform errors:
 
 - `permission_denied`: `READ_SMS` was denied or unavailable.
 - `invalid_arguments`: one or more query arguments had an unexpected type or invalid value (`start >= 0`, `count == -1 or >= 0`, `thread_id == -1 or >= 0`).
+- `invalid_response`: platform returned an unexpected payload shape.
 - `query_failed`: an unexpected platform failure occurred while querying SMS.
 
 ## Querying SMS messages
