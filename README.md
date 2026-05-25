@@ -85,20 +85,6 @@ OSV_SCANNER_IMAGE=ghcr.io/google/osv-scanner@sha256:<digest> bash scripts/securi
 
 CI also runs lockfile scans on pull requests and pushes using `.github/workflows/security-scan.yml`.
 
-### Dependency maintenance
-
-Generate a dependency status report with:
-
-```bash
-bash scripts/dependency_report.sh
-```
-
-See `docs/dependency-refresh-plan.md` for update cadence and triage workflow.
-
-### Security release gate
-
-Use `docs/security-release-checklist.md` before release-bound merges.
-
 ## Querying SMS messages
 
 Add the import statement for sms and create an instance of the SmsQuery class:
