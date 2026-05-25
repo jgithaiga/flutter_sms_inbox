@@ -11,6 +11,7 @@ import io.flutter.plugin.common.MethodChannel;
 public class SmsQueryHandler {
 
     private static final String TAG = "SmsQueryHandler";
+    private static final int MAX_FALLBACK_QUERY_COUNT = 1000;
     private static final String[] PROJECTION = {
             "_id",
             "thread_id",
@@ -45,6 +46,16 @@ public class SmsQueryHandler {
         ArrayList<JSONObject> list = new ArrayList<>();
         Cursor cursor = null;
         try {
+            if (start < 0) {
+                start = 0;
+            }
+
+            if (count < 0) {
+                count = MAX_FALLBACK_QUERY_COUNT;
+            } else if (count > MAX_FALLBACK_QUERY_COUNT) {
+                count = MAX_FALLBACK_QUERY_COUNT;
+            }
+
             if (count == 0) {
                 result.success(list);
                 return;

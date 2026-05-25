@@ -2,6 +2,8 @@ part of '../flutter_sms_inbox.dart';
 
 class SmsQuery {
   static SmsQuery? instance;
+  static const int _defaultQueryCount = 200;
+  static const int _maxQueryWindow = 1000;
   final MethodChannel _channel;
 
   factory SmsQuery() {
@@ -102,16 +104,13 @@ class SmsQuery {
             ? null
             : normalizedAddress;
 
-    final List<SmsQueryKind> uniqueKinds = <SmsQueryKind>[];
-    for (final SmsQueryKind kind in kinds) {
-      if (!uniqueKinds.contains(kind)) {
-        uniqueKinds.add(kind);
-      }
-    }
+    final Set<SmsQueryKind> uniqueKinds = <SmsQueryKind>{...kinds};
 
-    int? remainingCount;
-    if (count != null && count > 0) {
-      remainingCount = count;
+    int remainingCount;
+    if (count == null || count < 0) {
+      remainingCount = _defaultQueryCount;
+    } else {
+      remainingCount = count.clamp(1, _maxQueryWindow);
     }
 
     int remainingStart = 0;
@@ -121,10 +120,8 @@ class SmsQuery {
 
     List<SmsMessage> result = [];
     for (var kind in uniqueKinds) {
-      int? requestCount;
-      if (remainingCount != null) {
-        requestCount = remainingCount + remainingStart;
-      }
+      final int requestCount =
+          (remainingCount + remainingStart).clamp(1, _maxQueryWindow);
 
       final List<SmsMessage> fetched = await _querySms(
         count: requestCount,
@@ -142,17 +139,15 @@ class SmsQuery {
       List<SmsMessage> effective =
           (startIndex == 0) ? fetched : fetched.sublist(startIndex);
 
-      if (remainingCount != null && effective.length > remainingCount) {
+      if (effective.length > remainingCount) {
         effective = effective.sublist(0, remainingCount);
       }
 
       result.addAll(effective);
 
-      if (remainingCount != null) {
-        remainingCount -= effective.length;
-        if (remainingCount <= 0) {
-          break;
-        }
+      remainingCount -= effective.length;
+      if (remainingCount <= 0) {
+        break;
       }
     }
 

@@ -53,6 +53,10 @@ public class SmsQuery implements MethodChannel.MethodCallHandler {
             if (threadId < -1) {
                 throw new IllegalArgumentException("Argument 'thread_id' must be -1 or >= 0");
             }
+        } catch (ClassCastException e) {
+            Log.w(TAG, "Invalid method arguments for " + call.method, e);
+            result.error("invalid_arguments", "One or more arguments had an invalid runtime type", null);
+            return;
         } catch (IllegalArgumentException e) {
             Log.w(TAG, "Invalid method arguments for " + call.method, e);
             result.error("invalid_arguments", e.getMessage(), null);
@@ -68,7 +72,12 @@ public class SmsQuery implements MethodChannel.MethodCallHandler {
         if (!call.hasArgument(key)) {
             return defaultValue;
         }
-        Object value = call.argument(key);
+        Object value;
+        try {
+            value = call.argument(key);
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Argument '" + key + "' must be a number", e);
+        }
         if (value == null) {
             return defaultValue;
         }
@@ -82,7 +91,12 @@ public class SmsQuery implements MethodChannel.MethodCallHandler {
         if (!call.hasArgument(key)) {
             return defaultValue;
         }
-        Object value = call.argument(key);
+        Object value;
+        try {
+            value = call.argument(key);
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Argument '" + key + "' must be a string", e);
+        }
         if (value == null) {
             return defaultValue;
         }
