@@ -11,17 +11,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_sms_inbox_example/main.dart';
 
 void main() {
-  testWidgets('Verify Platform version', (WidgetTester tester) async {
+  testWidgets('Shows initial empty-state UI', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
 
-    // Verify that platform version is retrieved.
-    expect(
-      find.byWidgetPredicate(
-        (Widget widget) => widget is Text &&
-                           widget.data!.startsWith('Running on:'),
-      ),
-      findsOneWidget,
-    );
+    expect(find.text('SMS Inbox Example'), findsOneWidget);
+    expect(find.textContaining('No messages to show.'), findsOneWidget);
+    expect(find.byTooltip('Show message body (debug)'), findsOneWidget);
+    expect(find.byIcon(Icons.refresh), findsOneWidget);
   });
 }
