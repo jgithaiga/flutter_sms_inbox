@@ -26,5 +26,6 @@ build/
 .history
 .svn/
 coverage/
+docs/
 
 example/.flutter-plugins-dependencies
